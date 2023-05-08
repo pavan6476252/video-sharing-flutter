@@ -10,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:task/providers/video_file_provider.dart';
+import 'package:task/util/shimmer_effect.dart';
 import 'package:task/util/show_snack_bar.dart';
 import 'package:task/views/upload/upload_page.dart';
 
@@ -192,9 +193,7 @@ class _VideoRecorderScreenState extends ConsumerState<VideoRecorderScreen> {
                     aspectRatio: _cameraController!.value.aspectRatio,
                     child: CameraPreview(_cameraController!),
                   )
-                : const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                : const Center(child: Icon(Icons.camera_alt_outlined,size: 50,),)
           ),
           Expanded(
             flex: 1,
@@ -258,7 +257,7 @@ class CameraBottomBar extends StatelessWidget {
         children: <Widget>[
           IconButton(
             icon: const Icon(Icons.camera_rear_rounded),
-            color: Colors.white,
+            // color: Colors.white,
             onPressed: () {
               switchCamera();
             },
@@ -277,12 +276,12 @@ class CameraBottomBar extends StatelessWidget {
           isPaused
               ? IconButton(
                   icon: const Icon(Icons.play_arrow),
-                  color: Colors.white,
+                  // color: Colors.white,
                   onPressed: onResumeRecording,
                 )
               : IconButton(
                   icon: const Icon(Icons.pause),
-                  color: Colors.white,
+                  // color: Colors.white,
                   onPressed: onPauseRecording,
                 ),
           videoDuration == Duration.zero

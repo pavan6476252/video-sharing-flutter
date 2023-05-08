@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:task/util/show_snack_bar.dart';
 
 class AuthService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -15,10 +16,12 @@ class AuthService extends ChangeNotifier {
   bool _codeSent = false;
 
   Stream<User?> get user {
+    
     return _auth.authStateChanges();
   }
 
   get currentUser {
+    
     return _auth.currentUser;
   }
 
@@ -30,7 +33,7 @@ class AuthService extends ChangeNotifier {
       },
       verificationFailed: (FirebaseAuthException e) {
         if (e.code == 'invalid-phone-number') {
-          print('The provided phone number is not valid.');
+          showPopupMessage('The provided phone number is not valid.');
         }
       },
       codeSent: (String verificationId, int? resendToken) {
@@ -52,7 +55,7 @@ class AuthService extends ChangeNotifier {
 
   Future<void> resendOTP() async {
     if (!_codeSent) {
-      print('Cannot resend OTP before it is sent');
+      showPopupMessage('Cannot resend OTP before it is sent');
       return;
     }
 
@@ -60,27 +63,27 @@ class AuthService extends ChangeNotifier {
       await _auth.verifyPhoneNumber(
         phoneNumber: _auth.currentUser!.phoneNumber!,
         forceResendingToken: _resendToken,
-        timeout: Duration(seconds: 60),
+        timeout: const Duration(seconds: 60),
         verificationCompleted: (PhoneAuthCredential credential) async {
           await _auth.signInWithCredential(credential);
         },
         verificationFailed: (FirebaseAuthException e) {
           if (e.code == 'invalid-phone-number') {
-            print('The provided phone number is not valid.');
+            showPopupMessage('The provided phone number is not valid.');
           }
         },
         codeSent: (String verificationId, int? resendToken) {
           _verificationId = verificationId;
           _resendToken = resendToken;
           _codeSent = true;
-          print('OTP resent');
+         showPopupMessage('Otp sent');
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           _verificationId = verificationId;
         },
       );
     } catch (error) {
-      print(error.toString());
+     showPopupMessage(error.toString());
     }
   }
 
@@ -88,8 +91,8 @@ class AuthService extends ChangeNotifier {
     try {
       return await _auth.signOut();
     } catch (error) {
-      print(error.toString());
-      return null;
+     
+     showPopupMessage(error.toString());
     }
   }
 

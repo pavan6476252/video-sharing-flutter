@@ -31,7 +31,7 @@ class VideoUploadService extends ChangeNotifier {
   }
 
   Future<void> addVideo(File videoFile, File thumbnailFile, String title,
-      String category, String uploaderProfileId, String location) async {
+      String category, String uploaderProfileId,String description , String photoUrl ,String userName, String location) async {
     setTitle("Video upload");
     try {
       final storageRef = FirebaseStorage.instance.ref();

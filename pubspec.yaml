@@ -55,6 +55,10 @@ dependencies:
   dropdown_search: ^5.0.6
   video_thumbnail: ^0.5.3
   fluttertoast: ^8.2.1
+  firebase_admin: ^0.2.0
+  googleapis_auth: ^1.4.0
+  shimmer: ^2.0.0
+  chewie: ^1.4.0
   
 
 

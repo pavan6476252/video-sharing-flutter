@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task/providers/auth_provider.dart';
+import 'package:task/util/notification_dialogue.dart';
+import 'package:task/util/shimmer_effect.dart';
 import 'package:task/views/home/explore_page.dart';
 import 'package:task/views/home/library_page.dart';
 import 'package:task/views/profile/user_profile.dart';
@@ -26,25 +28,34 @@ class _HomePageState extends ConsumerState<HomePage> {
       appBar: AppBar(
         title: const Text("Flutter Assignment"),
         actions: [
-          InkWell(
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const UserProfilePage(),
-                )),
-            child: CircleAvatar(
-              radius: 20,
-              backgroundImage: CachedNetworkImageProvider(
-                  authSerivce.currentUser.photoURL ??
-                      "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
-                  errorListener: () {}),
-            ),
-          ),
+          // InkWell(
+          //   onTap: () => Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => const UserProfilePage(),
+          //       )),
+          //   child: CircleAvatar(
+          //     radius: 20,
+          //     backgroundImage: CachedNetworkImageProvider(
+          //         authSerivce.currentUser.photoURL ??
+          //             "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
+          //         errorListener: () {}),
+          //   ),
+          // ),
+          IconButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return const NotificationDialog();
+                  },
+                );
+              },
+              icon: Icon(Icons.notifications_active_outlined)),
           const SizedBox(width: 10),
         ],
       ),
-      body:
-          [const ExplorePage(), const LibraryPage()].elementAt(_selectedIndex),
+      body: [const ExplorePage(), LibraryPage()].elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedIndex,
           onTap: (value) => setState(() {
