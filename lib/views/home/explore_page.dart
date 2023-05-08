@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task/util/search_bar.dart';
+import 'package:task/util/shimmer_effect.dart';
 import 'package:task/views/videos/videoCard.dart';
 
 import '../../models/video_model.dart';
@@ -15,6 +16,13 @@ class _ExplorePageState extends State<ExplorePage> {
   final _scrollController = ScrollController();
   late Stream<List<Video>> _videosStream;
   List<Video> _videos = [];
+
+  Future<void> _refreshVideos() async {
+    // Implement the code to refresh the list of videos here
+    setState(() {
+      _videosStream = getVideos();
+    });
+  }
 
   @override
   void initState() {
@@ -32,7 +40,7 @@ class _ExplorePageState extends State<ExplorePage> {
   void _onScroll() {
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
-      // Load more videos here
+      // Load more videos function
     }
   }
 
@@ -42,7 +50,7 @@ class _ExplorePageState extends State<ExplorePage> {
       stream: _videosStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const ShimmerEffect();
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const Center(child: Text('No videos found.'));
         }
@@ -51,15 +59,18 @@ class _ExplorePageState extends State<ExplorePage> {
 
         return Column(
           children: [
-          SearchBar(),
-          Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: _videos.length,
-                itemBuilder: (context, index) {
-                  final video = _videos[index];
-                  return VideoCard(video: video);
-                },
+            SearchBar(),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _refreshVideos,
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: _videos.length,
+                  itemBuilder: (context, index) {
+                    final video = _videos[index];
+                    return VideoCard(video: video);
+                  },
+                ),
               ),
             ),
           ],
@@ -67,5 +78,4 @@ class _ExplorePageState extends State<ExplorePage> {
       },
     );
   }
-
 }

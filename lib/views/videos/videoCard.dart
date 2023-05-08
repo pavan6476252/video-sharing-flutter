@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task/util/cached_image.dart';
 import 'package:task/views/videos/video_viewer_screen.dart';
 
 import '../../models/video_model.dart';
 
-class VideoCard extends StatelessWidget {
+class VideoCard extends ConsumerWidget {
   final Video video;
 
   VideoCard({Key? key, required this.video}) : super(key: key);
@@ -13,7 +14,7 @@ class VideoCard extends StatelessWidget {
   DateTime now = DateTime.now();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: InkWell(
@@ -21,22 +22,13 @@ class VideoCard extends StatelessWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => VideoViewer(video: video),
+                builder: (context) => VideoViewer(id: video.id),
               ));
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Image.network(
-                  video.thumbnailUrl,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
+           VideoThumbnail(thumbnailUrl: video.thumbnailUrl),
             Column(
               children: [
                 ListTile(
@@ -50,10 +42,10 @@ class VideoCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  leading: const CircleAvatar(
+                  leading:  CircleAvatar(
                     radius: 16,
                     backgroundImage: CachedNetworkImageProvider(
-                      'https://via.placeholder.com/150',
+                     video.userPhotoUrl ??"https://cdn.drawception.com/images/avatars/647493-B9E.png",
                     ),
                   ),
                   title: Text(
@@ -65,9 +57,9 @@ class VideoCard extends StatelessWidget {
                   ),
                   subtitle: Row(
                     children: [
-                      const Text(
+                      Text(
                         // TODO: Replace with uploader name
-                        'Uploader Name',
+                        video.userName ?? "Unkown User",
                         style: TextStyle(fontSize: 14),
                       ),
                       const SizedBox(width: 4),
@@ -94,11 +86,13 @@ class VideoCard extends StatelessWidget {
                     children: [
                       Text(
                         ' ${now.difference(video.date).inDays} days ago',
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                       Text(
                         video.location,
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                     ],
                   ),

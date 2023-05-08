@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_admin/firebase_admin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -68,7 +69,7 @@ class _UploadPageState extends ConsumerState<UploadPage> {
   Widget build(BuildContext context) {
     final videoUploadService = ref.watch(videoUploadProvider);
 
-    final authService = ref.read(authProvider);
+    final authService = ref.read<AuthService>(authProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -81,7 +82,7 @@ class _UploadPageState extends ConsumerState<UploadPage> {
             _buildThumbnail(),
             _buildTitle(),
             _builLocation(),
-           
+
             _buildDescription(),
             _buildCategory(),
             ElevatedButton(
@@ -91,18 +92,22 @@ class _UploadPageState extends ConsumerState<UploadPage> {
                       isError: true);
                   return;
                 }
+
                 videoUploadService.addVideo(
                   File(videoService.getVideoFile().path),
                   _image!,
                   _titleController.text,
                   _category,
                   authService.currentUser.uid,
+                  _descriptionController.text,
+                  authService.currentUser.photoURL,
+                  authService.currentUser.displayName,
                   videoService.getLocation(),
                 );
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Alert(),
+                      builder: (context) => const Alert(),
                     ));
               },
               child: const Text('Upload'),
@@ -155,7 +160,7 @@ class _UploadPageState extends ConsumerState<UploadPage> {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
       } else {
-        print('No image selected.');
+        showPopupMessage('No image selected.');
       }
     });
   }
@@ -208,45 +213,45 @@ class _UploadPageState extends ConsumerState<UploadPage> {
     );
   }
 
-  void _uploadVideo() {
-    // videoUploadService.addVideo(
-    //   File(videoService.getVideoFile().path),
-    //   _image!,
-    //   _titleController.text,
-    //   _category,
-    //   authService.currentUser.uid,
-    //   videoService.getLocation(),
-    // // );
+  // void _uploadVideo() {
+  // videoUploadService.addVideo(
+  //   File(videoService.getVideoFile().path),
+  //   _image!,
+  //   _titleController.text,
+  //   _category,
+  //   authService.currentUser.uid,
+  //   videoService.getLocation(),
+  // // );
 
-    // showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return AlertDialog(
-    //         title: Text('Uploading Video...'),
-    //         content: Column(
-    //           mainAxisSize: MainAxisSize.min,
-    //           children: [
-    //             LinearProgressIndicator(
-    //               value: (videoUploadService.uploadProgress),
-    //             ),
-    //             SizedBox(height: 16),
-    //             Text('Upload Progress: ${videoUploadService.uploadProgress}'),
-    //           ],
-    //         ));
-    //   },
-    // );
-    //  Navigator.pop(context);
-    // if (videoUploadService.isSuccess!) {
+  // showDialog(
+  //   context: context,
+  //   builder: (BuildContext context) {
+  //     return AlertDialog(
+  //         title: Text('Uploading Video...'),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             LinearProgressIndicator(
+  //               value: (videoUploadService.uploadProgress),
+  //             ),
+  //             SizedBox(height: 16),
+  //             Text('Upload Progress: ${videoUploadService.uploadProgress}'),
+  //           ],
+  //         ));
+  //   },
+  // );
+  //  Navigator.pop(context);
+  // if (videoUploadService.isSuccess!) {
 
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text('Video upload completed successfully!')),
-    //   );
-    // } else {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text('Video upload failed.')),
-    //   );
-    // }
-  }
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(content: Text('Video upload completed successfully!')),
+  //   );
+  // } else {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(content: Text('Video upload failed.')),
+  //   );
+  // }
+  // }
 
   _builLocation() {
     return Padding(
@@ -265,29 +270,91 @@ class _UploadPageState extends ConsumerState<UploadPage> {
 }
 
 class Alert extends ConsumerWidget {
-  const Alert({super.key});
+  const Alert({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final videoUploadService = ref.watch(videoUploadProvider);
-
+    if (videoUploadService.progress == 100) {
+      Future.delayed(
+      const  Duration(seconds: 3),
+        () => Navigator.pop(context),
+      );
+    }
     return Scaffold(
+      appBar: AppBar(),
       body: Center(
-          child: Card(
-              child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(videoUploadService.title),
-          ListTile(
-            title: Text('${videoUploadService.progress} %'),
-            subtitle: LinearProgressIndicator(
-              value: videoUploadService.progress,
-            ),
-            trailing: const Icon(Icons.upload),
+        child: Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
           ),
-          const Text("background uploading supported")
-        ],
-      ))),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Align
+                (alignment: Alignment.center,
+                  child: Text(
+                   "Video Uploading",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22.0,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                 Text(
+                      '${videoUploadService.progress.ceil()}%',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+              
+                const SizedBox(height: 16.0),
+                Column(
+                 
+                  children: [
+                    Column(
+                      children: [
+                        LinearProgressIndicator(
+                          value: videoUploadService.progress / 100,
+                          backgroundColor: Colors.grey[300],
+                          valueColor: const   AlwaysStoppedAnimation(Colors.blue),
+                        ),
+                      ],
+                    ),
+                const SizedBox(height: 12.0),
+                  
+                      Text(
+                  videoUploadService.title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16.0,
+                  ),
+                ),
+                   
+                  ],
+                ),
+                const SizedBox(height: 24.0),
+                Text(
+                  'Your video is being uploaded in the background. You will be notified after Upload',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16.0,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

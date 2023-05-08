@@ -8,7 +8,7 @@ import 'firebase_options.dart';
  
 import 'package:flutter/material.dart';
 
-import 'views/videos/home_page.dart';
+import 'home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
