@@ -1,4 +1,4 @@
-import 'dart:ffi';
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
@@ -84,11 +84,14 @@ class VideoUploadService extends ChangeNotifier {
         title: title,
         category: category,
         uploaderProfileId: uploaderProfileId,
+        description: description,
+        userName: userName,
+        userPhotoUrl: photoUrl,
         date: DateTime.now(),
         thumbnailUrl: thumbnailUrl,
         // Initialize other fields with default values
-        likes: 0,
-        dislikes: 0,
+        likes: [],
+        dislikes: [],
         views: 0,
         comments: [],
         videoUrl: '',

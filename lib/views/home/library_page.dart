@@ -17,56 +17,55 @@ class LibraryPage extends ConsumerWidget {
   @override
   final _formKey = GlobalKey<FormState>();
 
- Widget _buildProfileAvatar(BuildContext context, String? photoURL, String name, String phone, String uid) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      CircleAvatar(
-        radius: 60,
-        backgroundImage: CachedNetworkImageProvider(
-          photoURL ?? "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
-          errorListener: () {},
+  Widget _buildProfileAvatar(BuildContext context, String? photoURL,
+      String name, String phone, String uid) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        CircleAvatar(
+          radius: 60,
+          backgroundImage: CachedNetworkImageProvider(
+            photoURL ??
+                "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
+            errorListener: () {},
+          ),
         ),
-      ),
-      const SizedBox(height: 20),
-      Text(
-        name,
-        style: Theme.of(context).textTheme.headline6,
-      ),
-      Text(
-        phone,
-        style: Theme.of(context).textTheme.subtitle1,
-      ),
-      Text(
-        'UID: $uid',
-        style: Theme.of(context).textTheme.subtitle2,
-      ),
-      SizedBox(height: 8),
-
-      SizedBox(
-        
-        width: double.infinity,
-        child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const UserProfilePage()),
-            );
-          },
-          icon: Icon(Icons.person),
-          label: Text('My Profile'),
-          style: ElevatedButton.styleFrom(
-          
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+        const SizedBox(height: 20),
+        Text(
+          name,
+          style: Theme.of(context).textTheme.headline6,
+        ),
+        Text(
+          phone,
+          style: Theme.of(context).textTheme.subtitle1,
+        ),
+        Text(
+          'UID: $uid',
+          style: Theme.of(context).textTheme.subtitle2,
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const UserProfilePage()),
+              );
+            },
+            icon: const Icon(Icons.person),
+            label: const Text('My Profile'),
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
           ),
         ),
-      ),
-    ],
-  );
-}
-
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -81,11 +80,14 @@ class LibraryPage extends ConsumerWidget {
             _buildProfileAvatar(
                 context,
                 authService.currentUser.photoURL,
-                authService.currentUser.displayName,
+                authService.currentUser.displayName??"Change your name",
                 authService.currentUser.phoneNumber,
                 authService.currentUser.uid),
             const SizedBox(height: 15),
-            const Text("Uploaded Videos",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+            const Text(
+              "Uploaded Videos",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 10),
             Expanded(
               child: _uploadedVideosBuilder(
@@ -104,7 +106,11 @@ class LibraryPage extends ConsumerWidget {
               child: Text("Error $error"),
             ),
         loading: () => const ShimmerEffect(),
-        data: (data) => VideoList(videos: data));
+        data: (data) => data.isEmpty
+            ? const Center(
+                child: Text("No videos are uploaded by you"),
+              )
+            : VideoList(videos: data));
   }
 }
 
@@ -128,7 +134,7 @@ class _VideoListState extends State<VideoList> {
         itemCount: widget.videos.length,
         itemBuilder: (BuildContext context, int index) {
           final video = widget.videos[index];
-    
+
           return Card(
             child: InkWell(
                 onTap: () => Navigator.push(
@@ -142,7 +148,7 @@ class _VideoListState extends State<VideoList> {
                     setState(() {
                       widget.videos.removeAt(index);
                     });
-    
+
                     final snackBar = SnackBar(
                       content: Text('${video.title} deleted'),
                       action: SnackBarAction(
@@ -154,7 +160,7 @@ class _VideoListState extends State<VideoList> {
                         },
                       ),
                     );
-    
+
                     ScaffoldMessenger.of(context)
                         .showSnackBar(snackBar)
                         .closed

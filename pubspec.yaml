@@ -59,6 +59,7 @@ dependencies:
   googleapis_auth: ^1.4.0
   shimmer: ^2.0.0
   chewie: ^1.4.0
+  share_plus: ^6.3.4
   
 
 
