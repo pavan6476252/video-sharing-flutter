@@ -41,15 +41,17 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
   Widget _buildProfileAvatar(BuildContext context, String? photoURL) {
     return Stack(
       children: [
-        CircleAvatar(
-          radius: 60,
-          backgroundImage: CachedNetworkImageProvider(
-              photoURL ??
-                  "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
-              errorListener: () {
-            setState(() {});
-          }),
-        ),
+        pickedImage != null
+            ? CircleAvatar(radius: 60.0,
+             backgroundColor: Colors.white,
+             backgroundImage: FileImage(File(pickedImage!.path)))
+            : CircleAvatar(
+                radius: 60,
+                backgroundImage: CachedNetworkImageProvider(
+                    photoURL ??
+                        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
+                    errorListener: () {}),
+              ),
         Positioned(
           bottom: 0,
           right: 0,

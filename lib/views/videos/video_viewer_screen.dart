@@ -23,9 +23,7 @@ class VideoViewer extends ConsumerStatefulWidget {
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _VideoViewerState();
 }
-
-TextEditingController _replyTextController = TextEditingController();
-
+ 
 class _VideoViewerState extends ConsumerState<VideoViewer> {
   bool isLiked = false;
   bool isDisliked = false;

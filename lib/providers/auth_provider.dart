@@ -100,7 +100,8 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> updateProfile(String? name, XFile? image) async {
-   
+    try{
+      showPopupMessage("Uploading");
       if (name != null) {
         await _auth.currentUser!.updateDisplayName(name);
       }
@@ -111,7 +112,9 @@ class AuthService extends ChangeNotifier {
         await _auth.currentUser!
             .updatePhotoURL(await taskSnapshot.ref.getDownloadURL());
       }
-
+    }catch(e){
+      showPopupMessage("Uploading failed");
+    }
     
   }
 }

@@ -9,6 +9,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:task/providers/video_file_provider.dart';
 import 'package:task/util/shimmer_effect.dart';
 import 'package:task/util/show_snack_bar.dart';
@@ -40,6 +41,7 @@ class _VideoRecorderScreenState extends ConsumerState<VideoRecorderScreen> {
   late List<CameraDescription> cameras;
 
   final picker = ImagePicker();
+  bool cameraPermission = false;
 
   Future<void> pickVideo() async {
     final pickedFile = await picker.pickVideo(source: ImageSource.gallery);
@@ -71,8 +73,33 @@ class _VideoRecorderScreenState extends ConsumerState<VideoRecorderScreen> {
       cameras[_selectedCameraIndex],
       ResolutionPreset.high,
     );
-    await _cameraController!.initialize();
-    setState(() {});
+    _cameraController?.initialize().then((_) {
+      // if (!mounted) {
+      //   return;
+      // }
+      cameraPermission = true;
+      setState(() {});
+    }).catchError((Object e) {
+      if (e is CameraException) {
+        switch (e.code) {
+          case 'CameraAccessDenied':
+            showPopupMessage("CameraAccessDenied");
+            cameraPermission = false;
+            // _initializeCameraController();
+            // Navigator.pop(context);
+            break;
+          default:
+            // Handle other errors here.
+            break;
+        }
+        setState(() {});
+      }
+    });
+    // try{
+    // await _cameraController?.initialize();
+    // }catch(e){
+    //   await _cameraController?.initialize();
+    // }
   }
 
   Future<void> _startVideoRecording() async {
@@ -158,8 +185,8 @@ class _VideoRecorderScreenState extends ConsumerState<VideoRecorderScreen> {
   @override
   void initState() {
     super.initState();
-    videoService = ref.read<VideoService>(videoServiceProvider);
     _initializeCameraController();
+    videoService = ref.read<VideoService>(videoServiceProvider);
     _getCurrentLocation();
   }
 
@@ -168,6 +195,22 @@ class _VideoRecorderScreenState extends ConsumerState<VideoRecorderScreen> {
     _cameraController!.dispose();
     _timer.cancel();
     super.dispose();
+  }
+
+    
+
+  void permissionHandle()async{
+    PermissionStatus cam = await Permission.camera.request();
+    PermissionStatus mic = await Permission.microphone.request();
+    if(cam.isRestricted || cam.isDenied || cam.isPermanentlyDenied ||
+    mic.isRestricted || mic.isDenied || mic.isPermanentlyDenied){
+        openAppSettings();
+        return;
+    }
+   cameraPermission =true ;
+   setState(() {
+     _initializeCameraController();
+   });
   }
 
   @override
@@ -181,20 +224,34 @@ class _VideoRecorderScreenState extends ConsumerState<VideoRecorderScreen> {
                 pickVideo();
               },
               icon: Icon(Icons.photo)),
-          Chip(label: Text(_currentCity ?? "Unknown"),)
+          Chip(
+            label: Text(_currentCity ?? "Unknown"),
+          )
         ],
       ),
       body: Column(
         children: <Widget>[
           Expanded(
-            flex: 10,
-            child: _cameraController != null
-                ? AspectRatio(
-                    aspectRatio: _cameraController!.value.aspectRatio,
-                    child: CameraPreview(_cameraController!),
-                  )
-                : const Center(child: Icon(Icons.camera_alt_outlined,size: 50,),)
-          ),
+              flex: 10,
+              child: cameraPermission
+                  ?
+                  // AspectRatio(
+                  // aspectRatio: _cameraController!.value.aspectRatio,
+                  // child:
+                  CameraPreview(_cameraController!)
+                  // )
+                  : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.camera_alt_outlined,
+                        size: 50,
+                      ),
+                      ElevatedButton(
+                          onPressed: () =>  permissionHandle(),
+                          child: Text("Grant permission"))
+                    ],
+                  )),
           Expanded(
             flex: 1,
             child: CameraBottomBar(
