@@ -9,6 +9,7 @@ import 'package:task/providers/uploading_video_provider.dart';
 import 'package:task/providers/auth_provider.dart';
 import 'package:task/providers/video_file_provider.dart';
 import 'package:task/util/show_snack_bar.dart';
+import 'package:task/views/profile/user_profile.dart';
 
 // import 'package:video_thumbnail/video_thumbnail.dart';
 
@@ -64,13 +65,18 @@ class _UploadPageState extends ConsumerState<UploadPage> {
     'Sports',
     'Travel & Events'
   ];
+  bool openProfile = false;
 
   @override
   Widget build(BuildContext context) {
     final videoUploadService = ref.watch(videoUploadProvider);
 
     final authService = ref.read<AuthService>(authProvider);
-
+    if (authService.currentUser.photoURL == null ||
+        authService.currentUser.displayName == null) {
+      openProfile = true;
+      setState(() {});
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Upload Video'),
@@ -85,33 +91,42 @@ class _UploadPageState extends ConsumerState<UploadPage> {
 
             _buildDescription(),
             _buildCategory(),
-            ElevatedButton(
-              onPressed: () {
-                if (_image == null) {
-                  showSnackBar(context, "Please Provide Thumbnail",
-                      isError: true);
-                  return;
-                }
 
-                videoUploadService.addVideo(
-                  File(videoService.getVideoFile().path),
-                  _image!,
-                  _titleController.text,
-                  _category,
-                  authService.currentUser.uid,
-                  _descriptionController.text,
-                  authService.currentUser.photoURL,
-                  authService.currentUser.displayName,
-                  videoService.getLocation(),
-                );
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const Alert(),
-                    ));
-              },
-              child: const Text('Upload'),
-            ),
+            openProfile
+                ? ElevatedButton(
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserProfilePage(),
+                        )),
+                    child: Text("open profile and fill name and provide image"))
+                : ElevatedButton(
+                    onPressed: () {
+                      if (_image == null) {
+                        showSnackBar(context, "Please Provide Thumbnail",
+                            isError: true);
+                        return;
+                      }
+
+                      videoUploadService.addVideo(
+                        File(videoService.getVideoFile().path),
+                        _image!,
+                        _titleController.text,
+                        _category,
+                        authService.currentUser.uid,
+                        _descriptionController.text,
+                        authService.currentUser.photoURL,
+                        authService.currentUser.displayName,
+                        videoService.getLocation(),
+                      );
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Alert(),
+                          ));
+                    },
+                    child: Text('Upload'),
+                  ),
           ],
         ),
       ),
@@ -277,7 +292,7 @@ class Alert extends ConsumerWidget {
     final videoUploadService = ref.watch(videoUploadProvider);
     if (videoUploadService.progress == 100) {
       Future.delayed(
-      const  Duration(seconds: 3),
+        const Duration(seconds: 3),
         () => Navigator.pop(context),
       );
     }
@@ -295,10 +310,10 @@ class Alert extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Align
-                (alignment: Alignment.center,
+                const Align(
+                  alignment: Alignment.center,
                   child: Text(
-                   "Video Uploading",
+                    "Video Uploading",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 22.0,
@@ -306,38 +321,34 @@ class Alert extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16.0),
-                 Text(
-                      '${videoUploadService.progress.ceil()}%',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20.0,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-              
+                Text(
+                  '${videoUploadService.progress.ceil()}%',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20.0,
+                    color: Colors.grey[700],
+                  ),
+                ),
                 const SizedBox(height: 16.0),
                 Column(
-                 
                   children: [
                     Column(
                       children: [
                         LinearProgressIndicator(
                           value: videoUploadService.progress / 100,
                           backgroundColor: Colors.grey[300],
-                          valueColor: const   AlwaysStoppedAnimation(Colors.blue),
+                          valueColor: const AlwaysStoppedAnimation(Colors.blue),
                         ),
                       ],
                     ),
-                const SizedBox(height: 12.0),
-                  
-                      Text(
-                  videoUploadService.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 16.0,
-                  ),
-                ),
-                   
+                    const SizedBox(height: 12.0),
+                    Text(
+                      videoUploadService.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 16.0,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24.0),
