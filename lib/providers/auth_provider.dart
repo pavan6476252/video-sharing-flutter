@@ -14,6 +14,7 @@ class AuthService extends ChangeNotifier {
   String _verificationId = '';
   int? _resendToken;
   bool _codeSent = false;
+  
 
   Stream<User?> get user {
     
@@ -24,10 +25,11 @@ class AuthService extends ChangeNotifier {
     
     return _auth.currentUser;
   }
-
+   String phoneNum='';
   Future verifyPhoneNumber(String phoneNumber) async {
+    phoneNum = phoneNumber;
     await _auth.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
+     phoneNumber:  phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
         await _auth.signInWithCredential(credential);
       },
@@ -49,7 +51,7 @@ class AuthService extends ChangeNotifier {
 
   Future<void> signWithOtp(String otp) async {
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: _verificationId, smsCode: '123456');
+        verificationId: _verificationId, smsCode: otp);
     await _auth.signInWithCredential(credential);
   }
 
@@ -61,7 +63,7 @@ class AuthService extends ChangeNotifier {
 
     try {
       await _auth.verifyPhoneNumber(
-        phoneNumber: _auth.currentUser!.phoneNumber!,
+        phoneNumber: phoneNum,
         forceResendingToken: _resendToken,
         timeout: const Duration(seconds: 60),
         verificationCompleted: (PhoneAuthCredential credential) async {
@@ -84,6 +86,7 @@ class AuthService extends ChangeNotifier {
       );
     } catch (error) {
      showPopupMessage(error.toString());
+     print(error);
     }
   }
 

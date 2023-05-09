@@ -5,6 +5,7 @@ import 'package:task/util/cached_image.dart';
 import 'package:task/views/videos/video_viewer_screen.dart';
 
 import '../../models/video_model.dart';
+import '../../util/share_plus.dart';
 
 class VideoCard extends ConsumerWidget {
   final Video video;
@@ -28,7 +29,7 @@ class VideoCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-           VideoThumbnail(thumbnailUrl: video.thumbnailUrl),
+            VideoThumbnail(thumbnailUrl: video.thumbnailUrl),
             Column(
               children: [
                 ListTile(
@@ -36,16 +37,17 @@ class VideoCard extends ConsumerWidget {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.share),
-                        onPressed: () {
-                          // TODO: Implement share button
+                        onPressed: ()async {
+                          shareVideo(video.title, video.videoUrl);
                         },
                       ),
                     ],
                   ),
-                  leading:  CircleAvatar(
+                  leading: CircleAvatar(
                     radius: 16,
                     backgroundImage: CachedNetworkImageProvider(
-                     video.userPhotoUrl ??"https://cdn.drawception.com/images/avatars/647493-B9E.png",
+                      video.userPhotoUrl ??
+                          "https://cdn.drawception.com/images/avatars/647493-B9E.png",
                     ),
                   ),
                   title: Text(
@@ -85,12 +87,12 @@ class VideoCard extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Text(
-                        ' ${now.difference(video.date).inDays} days ago',
+                        ' 🕛  ${now.difference(video.date).inDays} days ago',
                         style:
                             const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                       Text(
-                        video.location,
+                        '📌 ' + video.location,
                         style:
                             const TextStyle(fontSize: 12, color: Colors.grey),
                       ),

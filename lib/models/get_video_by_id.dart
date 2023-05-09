@@ -14,26 +14,28 @@ final videoProvider = FutureProvider.family<Video?, String>((ref, id) async {
 
   final data = videoSnapshot.data();
   final commentsData = data!['comments'] ?? [];
+  print("here-------------------");
+  print(data.toString());
 
   final comments = commentsData
       .map<Comment>((commentData) => Comment.fromMap(commentData))
       .toList();
 
   return Video(
-    id: id,
-    title: data['title'],
-    likes: data['likes'],
-    dislikes: data['dislikes'],
-    views: data['views'],
-    date: DateTime.parse(data['date']),
-    category: data['category'],
-    comments: comments,
-    uploaderProfileId: data['uploaderProfileId'],
-    thumbnailUrl: data['thumbnailUrl'],
-    videoUrl: data['videoUrl'],
-    location: data['location'],
-    userPhotoUrl: data['userPhotoUrl'],
-    userName: data['userName'],
-    description: data['description'],
-  );
+      id: data['id'],
+      title: data['title'],
+      likes: List<String>.from(data['likes'] ?? []),
+      dislikes: List<String>.from(data['dislikes'] ?? []),
+      views: data['views'],
+      date: DateTime.parse(data['date']),
+      category: data['category'],
+      comments:comments,
+      uploaderProfileId: data['uploaderProfileId'],
+      thumbnailUrl: data['thumbnailUrl'],
+      videoUrl: data['videoUrl'],
+      location: data['location'],
+      userPhotoUrl: data['userPhotoUrl'],
+      userName: data['userName'],
+      description: data['description'],
+    );
 });

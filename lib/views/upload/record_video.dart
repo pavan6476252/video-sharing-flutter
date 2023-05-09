@@ -180,8 +180,8 @@ class _VideoRecorderScreenState extends ConsumerState<VideoRecorderScreen> {
               onPressed: () {
                 pickVideo();
               },
-              icon: Icon(Icons.video_camera_back_outlined)),
-          Chip(label: Text(_currentCity ?? "Unknown"))
+              icon: Icon(Icons.photo)),
+          Chip(label: Text(_currentCity ?? "Unknown"),)
         ],
       ),
       body: Column(

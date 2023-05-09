@@ -14,7 +14,7 @@ class ExplorePage extends StatefulWidget {
 
 class _ExplorePageState extends State<ExplorePage> {
   final _scrollController = ScrollController();
-  late Stream<List<Video>> _videosStream;
+  late Future<List<Video>> _videosStream;
   List<Video> _videos = [];
 
   Future<void> _refreshVideos() async {
@@ -46,20 +46,23 @@ class _ExplorePageState extends State<ExplorePage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Video>>(
-      stream: _videosStream,
+    return FutureBuilder<List<Video>>(
+      future: _videosStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const ShimmerEffect();
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const Center(child: Text('No videos found.'));
         }
-
+      print(snapshot.data);
         _videos = snapshot.data!;
 
         return Column(
           children: [
-            SearchBar(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 2),
+              child: SearchBar(),
+            ),
             Expanded(
               child: RefreshIndicator(
                 onRefresh: _refreshVideos,

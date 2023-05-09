@@ -295,11 +295,11 @@ class Alert extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Align
+                const Align
                 (alignment: Alignment.center,
                   child: Text(
                    "Video Uploading",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 22.0,
                     ),

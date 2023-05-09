@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:task/providers/auth_provider.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -22,16 +23,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       appBar: AppBar(
         title: const Text('Phone Number Login'),
       ),
-      body: Center(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextFormField(
+      body: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/mobile.svg',
+              height: 250,
+            ),
+            Card(
+              child: TextFormField(
+                initialValue: '+91',
                 keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                  hintText: 'Enter phone number',
+                decoration: InputDecoration(
+                  labelText: 'Mobile Number',
+                  hintText: 'Enter your phone number',
+                  prefixIcon: Icon(Icons.phone),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -43,21 +54,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   _phoneNumber = value;
                 },
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    await authService.verifyPhoneNumber(_phoneNumber);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const OptScreen()));
-                  }
-                },
-                child: const Text('Send OTP'),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  await authService.verifyPhoneNumber(_phoneNumber);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const OptScreen()));
+                }
+              },
+              child: const Text('Send OTP'),
+            ),
+          ],
         ),
       ),
     );
@@ -109,48 +120,59 @@ class _OptScreenState extends ConsumerState<OptScreen> {
       appBar: AppBar(
         title: const Text('Enter OTP'),
       ),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextFormField(
-                controller: _otpController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                maxLength: 6,
-                decoration: const InputDecoration(
-                  labelText: 'OTP',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter OTP';
-                  }
-                  if (value.length != 6) {
-                    return 'OTP must be 6 digits';
-                  }
-                  return null;
-                },
+      body: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/otp.svg',
+                height: 250,
               ),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _handleOtpSubmit,
-              child: _isLoading
-                  ? const CircularProgressIndicator()
-                  : const Text('Submit OTP'),
-            ),
-            const SizedBox(height: 16.0),
-            TextButton(
-              onPressed: () async {
-                await _authService.resendOTP();
-              },
-              child: const Text('Resend OTP'),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextFormField(
+                  controller: _otpController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  maxLength: 6,
+                  decoration: const InputDecoration(
+                    labelText: 'OTP',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter OTP';
+                    }
+                    if (value.length != 6) {
+                      return 'OTP must be 6 digits';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              InkWell(
+                onTap: _isLoading ? null : _handleOtpSubmit,
+                child: Chip(
+                    label: _isLoading
+                        ? const CircularProgressIndicator()
+                        : const Text(
+                            'Submit OTP',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w400),
+                          )),
+              ),
+              const SizedBox(height: 16.0),
+              TextButton(
+                onPressed: () async {
+                  await _authService.resendOTP();
+                },
+                child: const Text('Resend OTP'),
+              ),
+            ],
+          ),
         ),
       ),
     );

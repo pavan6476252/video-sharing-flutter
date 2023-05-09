@@ -39,10 +39,24 @@ class Comment {
       replies: replies,
     );
   }
+
+  Comment copyWith({
+    String? id,
+    String? text,
+    DateTime? date,
+    List<Comment>? replies,
+  }) {
+    return Comment(
+      id: id ?? this.id,
+      text: text ?? this.text,
+      date: date ?? this.date,
+      replies: replies ?? this.replies,
+    );
+  }
 }
 
 
-Future<void> addComment(String videoId, Comment comment) async {
+Future<void> addCommentToDB(String videoId, Comment comment) async {
   final videoRef = FirebaseFirestore.instance.collection('videos').doc(videoId);
 
   final videoSnapshot = await videoRef.get();
@@ -65,7 +79,7 @@ Future<void> addComment(String videoId, Comment comment) async {
   });
 }
 
-Future<void> replyToComment(
+Future<void> addReplyToCommentDB(
     String videoId, String commentId, Comment reply) async {
   final videoRef = FirebaseFirestore.instance.collection('videos').doc(videoId);
 
@@ -98,3 +112,5 @@ Future<void> replyToComment(
     'comments': comments.map((comment) => comment.toMap()).toList(),
   });
 }
+
+

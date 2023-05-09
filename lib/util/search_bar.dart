@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task/views/videos/search_screen.dart';
 
 import 'package:flutter/material.dart';
 
-class SearchBar extends StatefulWidget {
-  const SearchBar({Key? key}) : super(key: key);
+import '../providers/search_bar_provider.dart';
 
-  @override
-  _SearchBarState createState() => _SearchBarState();
-}
+class SearchBar extends ConsumerWidget {
+  SearchBar({Key? key}) : super(key: key);
 
-class _SearchBarState extends State<SearchBar> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchTermController = ref.watch(searchTermControllerProvider);
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 15,vertical: 5),
+      // margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -34,7 +33,8 @@ class _SearchBarState extends State<SearchBar> {
             child: Padding(
               padding: const EdgeInsets.only(left: 16),
               child: TextField(
-                controller: _searchController,
+                controller: searchTermController,
+               
                 decoration: InputDecoration(
                   hintText: 'Search videos',
                   hintStyle: const TextStyle(
