@@ -53,6 +53,6 @@ class CommentsNotifier extends ChangeNotifier {
 
   Future<void> setComments(List<Comment> comments) async {
     _comments = comments;
-    notifyListeners();
+    // notifyListeners();
   }
 }

@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 
 import '../providers/search_bar_provider.dart';
 
-class SearchBar extends ConsumerWidget {
-  SearchBar({Key? key}) : super(key: key);
+class CustomSearchBar extends ConsumerWidget {
+  CustomSearchBar({Key? key}) : super(key: key);
 
   final TextEditingController _searchController = TextEditingController();
 

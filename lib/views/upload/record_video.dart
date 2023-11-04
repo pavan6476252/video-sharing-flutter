@@ -193,7 +193,7 @@ class _VideoRecorderScreenState extends ConsumerState<VideoRecorderScreen> {
   @override
   void dispose() {
     _cameraController!.dispose();
-    _timer.cancel();
+  
     super.dispose();
   }
 
