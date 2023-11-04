@@ -61,7 +61,7 @@ class _ExplorePageState extends State<ExplorePage> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 2),
-              child: SearchBar(),
+              child: CustomSearchBar(),
             ),
             Expanded(
               child: RefreshIndicator(

@@ -57,7 +57,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
           right: 0,
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(20),
             ),
             child: IconButton(

@@ -86,7 +86,7 @@ class _VideoSearchScreenState extends ConsumerState<VideoSearchScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: SearchBar(),
+        title: CustomSearchBar(),
         automaticallyImplyLeading: false,
         leading: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0),
